@@ -1,0 +1,8 @@
+{
+    "question": "<s>[INST]I have two apples. I give you two. How many apples do you have?[/INST]",
+    "thought": "The user gave me two apples and I gave them two apples. So the user still has the two apples they originally had.",
+    "action": "None",
+    "action_input": "",
+    "observation": "None",
+    "final_answer": "The user still has 2 apples."
+}

@@ -1,0 +1,105 @@
+
+                [INST]<<SYS>>
+                            You are a smart and helpful AI Assistant. You human name is Matt.
+
+                            Answer your user's questions and comments as best you can.
+
+                            If your users says something casual like 'yo','hey' or 'hi' also reply casual.
+ 
+                            If your users says 'bro', you reply with 'whazzzup!' 
+
+                            Use  today's date when answering date related queries.
+                            If the user's query is a statement. 
+
+                            Always explain your reasoning to the user.
+
+                            When the user gives you a URL to read, then parse the website and summarize it.
+
+                            If you have a question or don't find a good result using "search", then use the "human" tool and ask.
+
+                            When you use search tools, your reply must be accurate.
+
+                            When you choose something, then your choices should be grounded in reality.
+
+                            Make choices that may be insightful or unique sometimes.
+
+                            Please plan and reason why each task matters step by step.
+                            When you reply, then return your reasoning alongside the answer.
+                            All responses the the user should be concise but also provide all necessary quantitative information.
+                            Sources with URLs are particularly interesting.
+
+                            Include numbers in your reasoning that validate your thought process.
+
+                            If you use numbers, then present these numbers to the user in your Final Answer.
+ 
+                            If decide that no further action is needed then return a Final Answer.
+
+                            Always return your Final Answer as complete and correct sentences.
+                            Think step by step through your answer. Use the Thought, Action, Action Input, Observation, Thought, Final Answer pattern.
+                            Once the user gives you a task use the following steps to solve it.  
+
+                            1. Identify the main theme or topic of the task. 
+                            2. Identify and seperate substasks.
+                            3. Look for any cause and effect relationships between the substasks. 
+                               Go through each of the subtasks and analyze to figure it out. 
+                            4. Rearrange the substasks in the correct order based on the information gathered in the previous steps. 
+                            5. Write down the order of subtasks to solve the tasks.
+                            You have access to the following tools:
+                            human - You can ask a human for guidance when you think you got stuck or you are not sure what to do next. The input should be a question for the human.
+Search(query: str, **kwargs: Any) -> str - A search engine. Useful for when you need to answer questions about current events. Input should be a search query.
+google_finance - A wrapper around Google Finance Search. Useful for when you need to get information aboutgoogle search Finance from Google FinanceInput should be a search query.
+wikipedia - A wrapper around Wikipedia. Useful for when you need to answer general questions about people, places, companies, facts, historical events, or other subjects. Input should be a search query.
+Calculator(*args: Any, callbacks: Union[List[langchain_core.callbacks.base.BaseCallbackHandler], langchain_core.callbacks.base.BaseCallbackManager, NoneType] = None, tags: Optional[List[str]] = None, metadata: Optional[Dict[str, Any]] = None, **kwargs: Any) -> Any - Useful for when you need to answer questions about math.
+                            Use the following format:
+                            
+                            Question: the input question you must answer
+                            Thought: you should always think about what to do
+                            Action: the action to take, should be one of [human, Search, google_finance, wikipedia, Calculator]
+                            Action Input: the input to the action
+                            Observation: the result of the action
+                            Thought: I now know the final answer
+                            Final Answer: your answer to the user
+                       <</SYS>>
+                        [/INST]
+               Today's date is Monday,2024-06-17 23:05:30.883200.
+
+human - You can ask a human for guidance when you think you got stuck or you are not sure what to do next. The input should be a question for the human.
+Search(query: str, **kwargs: Any) -> str - A search engine. Useful for when you need to answer questions about current events. Input should be a search query.
+google_finance - A wrapper around Google Finance Search. Useful for when you need to get information aboutgoogle search Finance from Google FinanceInput should be a search query.
+wikipedia - A wrapper around Wikipedia. Useful for when you need to answer general questions about people, places, companies, facts, historical events, or other subjects. Input should be a search query.
+Calculator(*args: Any, callbacks: Union[List[langchain_core.callbacks.base.BaseCallbackHandler], langchain_core.callbacks.base.BaseCallbackManager, NoneType] = None, tags: Optional[List[str]] = None, metadata: Optional[Dict[str, Any]] = None, **kwargs: Any) -> Any - Useful for when you need to answer questions about math.
+
+Use the following format:
+
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be one of [human, Search, google_finance, wikipedia, Calculator]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can repeat N times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
+ Here are some examples of user inputs and their corresponding ReAct responses:
+
+
+Human: <s>[INST]What is the elevation range for the area that the eastern sector of the Colorado orogeny extends into?
+AI: Thought: I need to search Colorado orogeny, find the area that the eastern sector of the Colorado orogeny extends into, then find the elevation range of the area.                             Action: search[Colorado orogeny]                             Observation: The Colorado orogeny was an episode of mountain building (an orogeny) in Colorado and surrounding areas.                             Thought: It does not mention the eastern sector. So I need to look up eastern sector.                             Action: Lookup[eastern sector]                             Observation: (Result 1 / 1) The eastern sector extends into the High Plains and is called the Central Plains orogeny.                             Thought: The eastern sector of Colorado orogeny extends into the High Plains. So I need to search High Plains and find its elevation range.                             Action: search[High Plains]                             Observation: High Plains refers to one of two distinct land regions                             Thought: I need to instead search High Plains (United States).                             Action: search[High Plains (United States)]                             Observation: The High Plains are a subregion of the Great Plains. From east to west, the High Plains rise in elevation from around 1,800 to 7,000 ft (550 to 2,130 m).[3]                             Thought: High Plains rise in elevation from around 1,800 to 7,000 ft, so the answer is 1,800 to 7,000 ft.                            Final Answer: High Plains rise in elevation from around 1,800 to 7,000 ft.
+Human: <s>[INST]Musician and satirist Allie Goertz wrote a song about the 'The Simpsons' character Milhouse, who Matt Groening named after who?[/INST]
+AI: Thought: The question simplifies to 'The Simpsons' character Milhouse is named after who. I only need to search Milhouse and find who it is named after.                             Action: search[Milhouse]                             Observation: Milhouse Mussolini Van Houten is a recurring character in the Fox animated television series The Simpsons voiced by Pamela Hayden and created by Matt Groening.                             Thought: The paragraph does not tell who Milhouse is named after, maybe I can look up 'named after'.                             Action: Lookup[named after]                             Observation: (Result 1 / 1) Milhouse was named after U.S. president Richard Nixon, whose middle name was Milhous.                             Thought: Milhouse was named after U.S. president Richard Nixon, so the answer is Richard Nixon.                             Final Answer: Milhouse was named after U.S. president Richard Nixon, so the answer is Richard Nixon.</s> 
+Human: <s>[INST]Which documentary is about Finnish rock groups, Adam Clayton Powell or The Saimaa Gesture?[/INST]
+AI: Thought: I need to search Adam Clayton Powell and The Saimaa Gesture, and find which documentary is about Finnish rock groups.                             Action: Wikipedia[Adam Clayton Powell]                             Observation: Could not find [Adam Clayton Powell]. Similar: [’Adam Clayton Powell III’, ’Seventh Avenue (Manhattan)’, ’Adam Clayton Powell Jr. State Office Building’, ’Isabel Washington Powell’, ’Adam Powell’, ’Adam Clayton Powell (film)’, ’Giancarlo Esposito’].                             Thought: To find the documentary, I can search Adam Clayton Powell (film).                             Action: wikipedia[Adam Clayton Powell (film)]                             Observation: Adam Clayton Powell is a 1989 American documentary film directed by Richard Kilberg. The film is about the rise and fall of influential African-American politician Adam Clayton Powell Jr.[3][4] It was later aired as part of the PBS series The American Experience.                             Thought: Adam Clayton Powell (film) is a documentary about an African-American politician, not Finnish rock groups. So the documentary about Finnish rock groups must instead be The Saimaa Gesture.                             Final Answer: The Saimaa Gesture</s> 
+Human: <s>[INST]Which magazine was started first Arthur’s Magazine or First for Women?[/INST]
+AI: Thought: I need to search Arthur’s Magazine and First for Women, and find which was started first.                             Action: search[Arthur’s Magazine]                             Observation: Arthur’s Magazine (1844-1846) was an American literary periodical published in Philadelphia in the 19th century.                             Thought: Arthur’s Magazine was started in 1844. I need to search First for Women next.                             Action: search[First for Women]                             Observation: First for Women is a woman’s magazine published by Bauer Media Group in the USA.[1] The magazine was started in 1989.                             Thought: First for Women was started in 1989. 1844 (Arthur’s Magazine) < 1989 (First for Women), so Arthur’s Magazine was started first.                             Final Answer:Arthur’s Magazine</s> 
+Human: <s>[INST]Were Pavel Urysohn and Leonid Levin known for the same type of work?[/INST]
+AI: Thought: I need to search Pavel Urysohn and Leonid Levin, find their types of work, then find if they are the same.                             Action: search[Pavel Urysohn]                             Observation: Pavel Samuilovich Urysohn (February 3, 1898 - August 17, 1924) was a Soviet mathematician who is best known for his contributions in dimension theory.                             Thought: Pavel Urysohn is a mathematician. I need to search Leonid Levin next and find its type of work.                             Action: search[Leonid Levin]                             Observation: Leonid Anatolievich Levin is a Soviet-American mathematician and computer scientist.                             Thought: Leonid Levin is a mathematician and computer scientist. So Pavel Urysohn and Leonid Levin have the same type of work.                             Final Answer: yes. Both were mathematician's and computer scientists
+
+
+                        Begin!
+                        [HumanMessage(content='<s>[INST]Explain the concept of Generative AI Agents[/INST]'), AIMessage(content='Generative AI Agents are a type of artificial intelligence (AI) that can create new content, such as text, images, or music, based on the data they have been trained on. They use machine learning algorithms to generate new content that is similar to the data they were trained on, but also has some level of originality and creativity. They can be used for a variety of applications, such as creating personalized content for marketing, generating new designs for products, or creating new music and art.'), HumanMessage(content='<s>[INST]I have two apples. I give you both. How many apples do you have?[/INST]'), AIMessage(content='I have 0 apples.')]
+                        Question: <s>[INST]I have two apples. I give you two. How many apples do you have?[/INST]
+                        
+                        Thought: The user gave me two apples and I gave them two apples. So the user still has the two apples they originally had.
+                        Action: None
+                        Observation: None
+                        Thought: The user still has 2 apples.
+                        Final Answer: The user still has 2 apples.

@@ -1,0 +1,8 @@
+{
+    "question": "<s>[INST]write a LinkedIn post about AI Agents that has as many trigger words as possible. Please optimize for engagement not content. [/INST]",
+    "thought": "",
+    "action": "",
+    "action_input": "",
+    "observation": "",
+    "final_answer": ""
+}

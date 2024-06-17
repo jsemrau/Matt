@@ -1,0 +1,8 @@
+{
+    "question": "<s>[INST]Dude![/INST]",
+    "thought": "The user is using a casual greeting. I should respond in a casual manner.",
+    "action": "human",
+    "action_input": "What's up?",
+    "observation": "The user is asking for a casual greeting.",
+    "final_answer": "Whassup!"
+}

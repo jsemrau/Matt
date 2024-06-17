@@ -1,0 +1,8 @@
+{
+    "question": "<s>[INST]What day is today?[/INST]",
+    "thought": "I need to find the current date.",
+    "action": "search[current date]",
+    "action_input": "",
+    "observation": "Today is Monday, June 17, 2024.",
+    "final_answer": "Today is Monday, June 17, 2024."
+}
