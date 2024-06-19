@@ -249,6 +249,7 @@ pytest
 pytest-runner
 python-crfsuite
 python-dateutil
+python-dotenv
 pytorch-lightning
 pytz
 PyYAML
