@@ -54,4 +54,4 @@ To get started with this project, follow these steps:
 After installation, you can start using the project by running the main script:
 
 ```sh
-python main.py
+streamlit run app.py
