@@ -23,7 +23,7 @@ To get started with this project, follow these steps:
 1. **Clone the repository**:
     ```sh
     git clone https://github.com/jsemrau/Matt.git
-    cd your-repo-name
+    cd Matt
     ```
 
 2. **Create a virtual environment**:
