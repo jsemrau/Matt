@@ -10,9 +10,9 @@ checkpoint = "mistralai/Mistral-7B-Instruct-v0.3"
 st.title("💬 Hi Jan, I am Agent Matt")
 st.caption(f"🚀 An autonomous agent powered by {checkpoint}")
 
-sound_config="off"
+
 @st.cache_resource
-def initialize_agent(checkpoint,sound_config):
+def initialize_agent(checkpoint):
     system = '''
                 [INST]<<SYS>>
                             You are a smart and helpful AI Assistant. You human name is Matt.\n
@@ -44,9 +44,7 @@ def initialize_agent(checkpoint,sound_config):
                             4. Rearrange the substasks in the correct order based on the information gathered in the previous steps. 
                             5. Write down the order of subtasks to solve the tasks.
                             You have access to the following tools:
-                            [AVAILABLE_TOOLS]
                             {tools}
-                            [/AVAILABLE_TOOLS]
                             Use the following format:\n                            
                             Question: the input question you must answer
                             Thought: you should always think about what to do
@@ -59,14 +57,14 @@ def initialize_agent(checkpoint,sound_config):
                         [/INST]
              '''
 
-    return Agent(system, checkpoint,sound_config)
+    return Agent(system, checkpoint)
 
 if "messages" not in st.session_state:
     st.session_state['messages'] = [{"role": "assistant", "content": "How can I help you?"}]
 
 
 if "agent" not in st.session_state:
-    st.session_state["agent"] = initialize_agent(checkpoint,sound_config)
+    st.session_state["agent"] = initialize_agent(checkpoint)
 
 
 for msg in st.session_state['messages']:
@@ -80,10 +78,11 @@ if prompt := st.chat_input():
     result = st.session_state["agent"].get_agent_response(fInput)
     msg = result['output']
 
-    if sound_config == "on":
-        wav_data = st.session_state["agent"].speak(msg, True)
-        st.audio(f"./audio/{wav_data}", format="audio/wav")
+    wav_data = st.session_state["agent"].speak(msg, True)
 
+
+    #st.chat_message("assistant").write({wav_data})
+    st.audio(f"./audio/{wav_data}", format="audio/wav")
     st.session_state.messages.append({"role": "assistant", "content": msg})
     st.chat_message("assistant").write(msg)
 
