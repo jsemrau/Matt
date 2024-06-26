@@ -55,8 +55,8 @@ os.environ["ALPHAVANTAGE_API_KEY"]=os.getenv("ALPHAVANTAGE_API_KEY")
 
 os.environ["PYTORCH_CUDA_ALLOC_CONF"]="expandable_segments:True"
 os.environ["PYTORCH_CUDA_ALLOC_CONF"]="max_split_size_mb:32"
-os.environ['CUDA_VISIBLE_DEVICES']='0,1,2,3,4'
-os.environ["PYTORCH_USE_CUDA_DSA"] = "0"
+os.environ['CUDA_VISIBLE_DEVICES']='4,0,1,2,3'
+os.environ["PYTORCH_USE_CUDA_DSA"] = "1"
 os.environ['HF_HOME']='/home/moebius/Projects/.cache/'
 class CustomOutputParser(AgentOutputParser):
 
@@ -194,6 +194,10 @@ class Agent():
 
         print("******************  Initializing Matt...  ************************")
         self.checkpoint=checkpoint
+
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+
         if sound_config=="on":
             self.speaker = SpeakAgent()
 
@@ -202,37 +206,44 @@ class Agent():
             fewshot_examples = json.load(file)
 
         #
-        quantization_config = BitsAndBytesConfig(load_in_4bit=True,llm_int8_threshold=50.0,llm_int8_enable_fp32_cpu_offload=True)
+        quantization_config = BitsAndBytesConfig(load_in_8bit=True,llm_int8_threshold=50.0,llm_int8_enable_fp32_cpu_offload=False)
 
         # First load the "brain" of the organization
         #https://docs.mistral.ai/api/#operation/createChatCompletion
 
         model_kwargs = {
-            "max_length": 8192,
+            "max_length": 16384,
             "device_map": "auto",
             "offload_folder": "offload",
             "max_memory": {3: "12GB", 1: "8GB", 2: "8GB", 0: "8GB", 4: "11GB"},
             "quantization_config": quantization_config,
+            #"attn_implementation":"flash_attention_2",
 
         }
 
-        tokenizer = MistralTokenizer.v3()
+        #tokenizer = MistralTokenizer.v3()
 
         llm = HuggingFacePipeline.from_model_id(
             model_id=checkpoint,
             task="text-generation",
             device=None,
+            batch_size=32,
             pipeline_kwargs={
                 "max_new_tokens": 2048,  # changed from 2048
                 "top_p": 0.15,  # changed from 0.15
                 #"temperature":0.1,
-                "top_k": 1,
+                #"top_k": 1,
                 "do_sample": True,  # changed from true
                 "torch_dtype": torch.float16,  # bfloat16
                 "use_fast": True,
+                #"repetition_penalty":1,
+                #"num_beams":4,
+                #"eos_token_id"
             },
             model_kwargs=model_kwargs
         )
+
+        #llm = llm.to_bettertransformer()
 
         if tool_config==1:
             tools = load_tools(["human", "serpapi","google-finance","wikipedia","llm-math"], llm=llm)
