@@ -1,19 +1,22 @@
-
 [
   {
-    "input": "What is the population of Tokyo?",
-    "output": "Question: What is the population of Tokyo?\nThought: I should look up the current population of Tokyo.\nAction: search\nAction Input: population of Tokyo 2024\nObservation: The population of Tokyo is approximately 14 million people.\nFinal Answer: I know now the final answer."
+    "input": "What is the tallest mountain in the world?",
+    "output": "Question: What is the tallest mountain in the world?\nThought: I need to find the current information on the tallest mountain in the world.\nAction: search\nAction Input: tallest mountain in the world\nObservation: Mount Everest is the tallest mountain in the world, standing at 29,032 feet (8,848 meters).\nFinal Answer: I know now the final answer. Mount Everest is the tallest mountain in the world, standing at 29,032 feet (8,848 meters)."
   },
   {
-    "input": "Who won the Nobel Prize in Literature in 2021?",
-    "output": "Question: Who won the Nobel Prize in Literature in 2021?\nThought: I need to find the recipient of the 2021 Nobel Prize in Literature.\nAction: search\nAction Input: Nobel Prize in Literature 2021 winner\nObservation: The Nobel Prize in Literature 2021 was awarded to Abdulrazak Gurnah.\nFinal Answer: I know now the final answer."
+    "input": "Who wrote the play 'Hamlet'?",
+    "output": "Question: Who wrote the play 'Hamlet'?\nThought: I need to find the author of the play 'Hamlet'.\nAction: wikipedia\nAction Input: Hamlet (play)\nObservation: 'Hamlet' was written by William Shakespeare.\nFinal Answer: I know now the final answer. 'Hamlet' was written by William Shakespeare."
   },
   {
-    "input": "What is the capital of Kazakhstan?",
-    "output": "Question: What is the capital of Kazakhstan?\nThought: I need to verify the capital city of Kazakhstan.\nAction: wikipedia\nAction Input: Kazakhstan\nObservation: The capital of Kazakhstan is Astana (formerly known as Nur-Sultan).\nFinal Answer: I know now the final answer."
+    "input": "What is the value of pi to 5 decimal places?",
+    "output": "Question: What is the value of pi to 5 decimal places?\nThought: I need to calculate or look up the value of pi to 5 decimal places.\nAction: math\nAction Input: value of pi to 5 decimal places\nObservation: The value of pi to 5 decimal places is 3.14159.\nFinal Answer: I know now the final answer. The value of pi to 5 decimal places is 3.14159."
   },
   {
-    "input": "What is the square root of 144?",
-    "output": "Question: What is the square root of 144?\nThought: I need to calculate the square root of 144.\nAction: math\nAction Input: sqrt(144)\nObservation: The square root of 144 is 12.\nFinal Answer: I know now the final answer."
+    "input": "Explain the theory of relativity.",
+    "output": "Question: Explain the theory of relativity.\nThought: I should find a concise explanation of the theory of relativity.\nAction: wikipedia\nAction Input: Theory of relativity\nObservation: The theory of relativity, developed by Albert Einstein, includes the special relativity and general relativity theories. Special relativity deals with the physics of moving bodies in the absence of gravitational fields, while general relativity provides a unified description of gravity as a geometric property of space and time or spacetime.\nFinal Answer: I know now the final answer. The theory of relativity, developed by Albert Einstein, includes the special relativity and general relativity theories. Special relativity deals with the physics of moving bodies in the absence of gravitational fields, while general relativity provides a unified description of gravity as a geometric property of space and time or spacetime."
+  },
+  {
+    "input": "What should I eat for breakfast?",
+    "output": "Question: What should I eat for breakfast?\nThought: I should provide a list of breakfast options based on the current time and the user's preferences.\nAction: human\nAction Input: What should I eat for breakfast?\nObservation: Routing the question to Streamlit for human input.\nFinal Answer: Route to Streamlit for human input."
   }
 ]
