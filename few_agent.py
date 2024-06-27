@@ -143,6 +143,16 @@ class CustomOutputParser(AgentOutputParser):
         with open(file_name, 'w') as file:
             file.write(str(jsondata))
 
+    def remove_human_ai_messages(self,input_string):
+        # Define a regular expression pattern to match the HumanMessage and AIMessage parts
+        pattern = r"\[HumanMessage\(content='.*?'\), AIMessage\(content='.*?'\)\]"
+
+        # Remove the matched parts from the input string
+        cleaned_string = re.sub(pattern, '', input_string)
+
+        # Remove any leading/trailing whitespace and return the cleaned string
+        return cleaned_string.strip()
+
     def parse_finish(self,llm_output):
         new_uuid = uuid.uuid4()
         file_name = f"./output/full/full_{new_uuid}.txt"
@@ -156,9 +166,9 @@ class CustomOutputParser(AgentOutputParser):
 
         parts = llm_output.split("Final Answer:")
 
-        me=False
+        debug=False
 
-        if me==True:
+        if debug==True:
             return parts
         else:
             # Get the part after the last "Final Answer:"
@@ -166,6 +176,9 @@ class CustomOutputParser(AgentOutputParser):
                 final_answer_part = parts[-1].strip()
             else:
                 final_answer_part = llm_output.strip()
+
+            clean_string=self.remove_human_ai_messages(final_answer_part)
+            return clean_string
 
             # Find the index of the first newline in this part
             newline_index = final_answer_part.find('\n')
@@ -201,12 +214,12 @@ class Agent():
         if sound_config=="on":
             self.speaker = SpeakAgent()
 
-        filename = "./data/few_shot_mistral.json"
+        filename = "./data/few_shot_mistral_mentor.json"
         with open(filename, 'r') as file:
             fewshot_examples = json.load(file)
 
         #
-        quantization_config = BitsAndBytesConfig(load_in_8bit=True,llm_int8_threshold=50.0,llm_int8_enable_fp32_cpu_offload=False)
+        quantization_config = BitsAndBytesConfig(load_in_8bit=True,llm_int8_threshold=50.0,llm_int8_enable_fp32_cpu_offload=True)
 
         # First load the "brain" of the organization
         #https://docs.mistral.ai/api/#operation/createChatCompletion
@@ -227,7 +240,7 @@ class Agent():
             model_id=checkpoint,
             task="text-generation",
             device=None,
-            batch_size=32,
+            batch_size=64,
             pipeline_kwargs={
                 "max_new_tokens": 2048,  # changed from 2048
                 "top_p": 0.15,  # changed from 0.15
@@ -246,7 +259,8 @@ class Agent():
         #llm = llm.to_bettertransformer()
 
         if tool_config==1:
-            tools = load_tools(["human", "serpapi","google-finance","wikipedia","llm-math"], llm=llm)
+            #"serpapi","google-finance"
+            tools = load_tools(["human", "wikipedia","llm-math"], llm=llm)
         elif tool_config==2:
             tools = load_tools(["wikipedia", "llm-math"], llm=llm)
         else:

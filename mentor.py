@@ -6,7 +6,7 @@ import datetime
 os.environ['HF_HOME']='/home/moebius/Projects/.cache/'
 
 checkpoint = "mistralai/Mistral-7B-Instruct-v0.3"
-
+checkpoint = "microsoft/Orca-2-13b"
 st.title("💬 Hi Jan, I am Agent Matt")
 st.caption(f"🚀 An autonomous agent powered by {checkpoint}")
 
@@ -14,7 +14,7 @@ sound_config="off"
 @st.cache_resource
 def initialize_agent(checkpoint,sound_config):
     system = '''
-                [INST]<<SYS>>
+               
                             The assistant is Matt, created by Jan. 
                             
                             Matt's knowledge base was last updated on August 2023. 
@@ -27,23 +27,33 @@ def initialize_agent(checkpoint,sound_config):
                             It uses markdown for coding.
                             
                             Matt does not mention this information about itself unless the information is directly pertinent to the human's query.
-                      
+                            
+                            When using the "human" tool stop thinking formulate a question as your final answer.
+                             
                             You have access to the following tools:
                             [AVAILABLE_TOOLS]
                             {tools}
                             [/AVAILABLE_TOOLS]
-                            Use the following format:\n                            
-                            Question: the input question you must answer
-                            Thought: you should always think about what to do
-                            Action: the action to take, should be one of [{tool_names}]
-                            Action Input: the input to the action
-                            Observation: the result of the action
-                            Final Answer: I know now the final answer
-                       <</SYS>>
-                        [/INST]
+                            Use the following format to answer questions:
+                            
+                            Question: the input question you must answer \n
+                                Thought: you should always think about what to do next. If the final answer is not clear, continue thinking and take another action.
+                                Action: the action to take, should be one of [{tool_names}]
+                                Action Input: the specific input or query for the chosen action
+                                Observation: the result of the action\n
+                            Final Answer: [your final answer here]
+                            Repeat the Thought -> Action -> Action Input -> Observation cycle until you can provide a clear and concise "Final Answer."
+                    
+                       
              '''
 
-    return Agent(system, checkpoint,sound_config)
+    if 'mistral' in checkpoint:
+        sPrompt=f" [INST]<<SYS>>{system}<</SYS>>[/INST]"
+    else:
+        sPrompt = f" [INST]<<SYS>>{system}<</SYS>>[/INST]"
+        sPrompt = f"<|im_start|>system\n{system}<|im_end|>\n"
+
+    return Agent(sPrompt, checkpoint,sound_config)
 
 if "messages" not in st.session_state:
     st.session_state['messages'] = [{"role": "assistant", "content": "How can I help you?"}]
@@ -60,7 +70,12 @@ if prompt := st.chat_input():
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
-    fInput = f"<s>[INST]{prompt}[/INST]"
+
+    if 'mistral' in checkpoint:
+        fInput=f" [INST]<<SYS>>{prompt}<</SYS>>[/INST]"
+    else:
+        fInput = f"<|im_start|>user\n{prompt}<|im_end|>\n"
+
     result = st.session_state["agent"].get_agent_response(fInput)
     msg = result['output']
 

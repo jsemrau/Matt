@@ -1,22 +1,22 @@
 [
   {
-    "input": "What is the tallest mountain in the world?",
-    "output": "Question: What is the tallest mountain in the world?\nThought: I need to find the current information on the tallest mountain in the world.\nAction: search\nAction Input: tallest mountain in the world\nObservation: Mount Everest is the tallest mountain in the world, standing at 29,032 feet (8,848 meters).\nFinal Answer: I know now the final answer. Mount Everest is the tallest mountain in the world, standing at 29,032 feet (8,848 meters)."
+    "input": "What is the capital of France?",
+    "output": "Question: What is the capital of France?\nThought: I need to find the capital city of France.\nAction: search\nAction Input: capital of France\nObservation: The capital of France is Paris.\nFinal Answer: I know now the final answer. The capital of France is Paris."
   },
   {
-    "input": "Who wrote the play 'Hamlet'?",
-    "output": "Question: Who wrote the play 'Hamlet'?\nThought: I need to find the author of the play 'Hamlet'.\nAction: wikipedia\nAction Input: Hamlet (play)\nObservation: 'Hamlet' was written by William Shakespeare.\nFinal Answer: I know now the final answer. 'Hamlet' was written by William Shakespeare."
+    "input": "Who discovered penicillin?",
+    "output": "Question: Who discovered penicillin?\nThought: I need to find out who discovered penicillin.\nAction: wikipedia\nAction Input: discovery of penicillin\nObservation: Penicillin was discovered by Alexander Fleming in 1928.\nFinal Answer: I know now the final answer. Penicillin was discovered by Alexander Fleming in 1928."
   },
   {
-    "input": "What is the value of pi to 5 decimal places?",
-    "output": "Question: What is the value of pi to 5 decimal places?\nThought: I need to calculate or look up the value of pi to 5 decimal places.\nAction: math\nAction Input: value of pi to 5 decimal places\nObservation: The value of pi to 5 decimal places is 3.14159.\nFinal Answer: I know now the final answer. The value of pi to 5 decimal places is 3.14159."
+    "input": "What is 25 multiplied by 16?",
+    "output": "Question: What is 25 multiplied by 16?\nThought: I need to calculate the product of 25 and 16.\nAction: math\nAction Input: 25 * 16\nObservation: The result of 25 multiplied by 16 is 400.\nFinal Answer: I know now the final answer. The result of 25 multiplied by 16 is 400."
   },
   {
-    "input": "Explain the theory of relativity.",
-    "output": "Question: Explain the theory of relativity.\nThought: I should find a concise explanation of the theory of relativity.\nAction: wikipedia\nAction Input: Theory of relativity\nObservation: The theory of relativity, developed by Albert Einstein, includes the special relativity and general relativity theories. Special relativity deals with the physics of moving bodies in the absence of gravitational fields, while general relativity provides a unified description of gravity as a geometric property of space and time or spacetime.\nFinal Answer: I know now the final answer. The theory of relativity, developed by Albert Einstein, includes the special relativity and general relativity theories. Special relativity deals with the physics of moving bodies in the absence of gravitational fields, while general relativity provides a unified description of gravity as a geometric property of space and time or spacetime."
+    "input": "Tell me about the life cycle of a butterfly.",
+    "output": "Question: Tell me about the life cycle of a butterfly.\nThought: I need to find detailed information about the life cycle of a butterfly.\nAction: wikipedia\nAction Input: life cycle of a butterfly\nObservation: A butterfly's life cycle consists of four stages: egg, larva (caterpillar), pupa (chrysalis), and adult (butterfly).\nFinal Answer: I know now the final answer. A butterfly's life cycle consists of four stages: egg, larva (caterpillar), pupa (chrysalis), and adult (butterfly)."
   },
   {
-    "input": "What should I eat for breakfast?",
-    "output": "Question: What should I eat for breakfast?\nThought: I should provide a list of breakfast options based on the current time and the user's preferences.\nAction: human\nAction Input: What should I eat for breakfast?\nObservation: Routing the question to Streamlit for human input.\nFinal Answer: Route to Streamlit for human input."
+    "input": "What are some healthy lunch ideas for someone on a low-carb diet?",
+    "output": "Question: What are some healthy lunch ideas for someone on a low-carb diet?\nThought: I should provide a list of healthy low-carb lunch options.\nAction: human\nAction Input: Dietary restrictions?\nObservation: I should ask the user for dietary restrictions.\nFinal Answer: Do you have any dietary restrictions?"
   }
 ]
