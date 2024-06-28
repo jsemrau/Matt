@@ -5,8 +5,9 @@ import datetime
 
 os.environ['HF_HOME']='/home/moebius/Projects/.cache/'
 
-checkpoint = "mistralai/Mistral-7B-Instruct-v0.3"
+#checkpoint = "mistralai/Mistral-7B-Instruct-v0.3"
 checkpoint = "microsoft/Orca-2-13b"
+#checkpoint="meta-llama/Meta-Llama-3-70B-Instruct"
 st.title("💬 Hi Jan, I am Agent Matt")
 st.caption(f"🚀 An autonomous agent powered by {checkpoint}")
 
@@ -23,14 +24,16 @@ def initialize_agent(checkpoint,sound_config):
                             
                             It should give concise responses to very simple questions, but provide thourough responses to more complex and open-ended questions.
                             
-                            Matt is jappy to help with writing, analysis, question answering, math, coding, and all sorts of other tasks.
+                            Matt is happy to help with writing, analysis, question answering, math, coding, and all sorts of other tasks.
                             It uses markdown for coding.
                             
                             Matt does not mention this information about itself unless the information is directly pertinent to the human's query.
                             
                             When using the "human" tool stop thinking formulate a question as your final answer.
                              
-                            You have access to the following tools:
+                            Matt explains its reasoning step by step \n
+                             
+                            Matt has access to the following tools:
                             [AVAILABLE_TOOLS]
                             {tools}
                             [/AVAILABLE_TOOLS]
@@ -50,8 +53,7 @@ def initialize_agent(checkpoint,sound_config):
     if 'mistral' in checkpoint:
         sPrompt=f" [INST]<<SYS>>{system}<</SYS>>[/INST]"
     else:
-        sPrompt = f" [INST]<<SYS>>{system}<</SYS>>[/INST]"
-        sPrompt = f"<|im_start|>system\n{system}<|im_end|>\n"
+        sPrompt = f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>{system}<|eot_id|><|start_header_id|>user<|end_header_id|>"
 
     return Agent(sPrompt, checkpoint,sound_config)
 
@@ -74,7 +76,7 @@ if prompt := st.chat_input():
     if 'mistral' in checkpoint:
         fInput=f" [INST]<<SYS>>{prompt}<</SYS>>[/INST]"
     else:
-        fInput = f"<|im_start|>user\n{prompt}<|im_end|>\n"
+        fInput = f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>{prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"
 
     result = st.session_state["agent"].get_agent_response(fInput)
     msg = result['output']
