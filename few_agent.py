@@ -256,13 +256,15 @@ class Agent():
         if tool_config==1:
             print(" All tools available")
             #human, Search, google_finance, arxiv, wikipedia, Calculator
-            tools = load_tools(["human","serpapi","google-finance", "arxiv", "wikipedia","llm-math"], llm=llm)
+            tools_array=["human","serpapi","google-finance", "arxiv", "wikipedia","llm-math"]
         elif tool_config==2:
-            tools = load_tools(["wikipedia", "llm-math"], llm=llm)
+            tools_array =["wikipedia", "llm-math"]
         elif tool_config==3:
-            tools = load_tools(["serpapi","wikipedia", "llm-math"], llm=llm)
+            tools_array=["serpapi","wikipedia", "llm-math"]
         else:
-            tools = load_tools(["human", "serpapi", "google-finance", "wikipedia", "llm-math"], llm=llm)
+            tools_array=["human", "serpapi", "google-finance", "wikipedia", "llm-math"]
+
+        tools = load_tools(tools_array, llm=llm)
 
         date_suffix = f" Today's date is { datetime.now().strftime('%A')},{ datetime.now() }."
         # Third define the way the agent should act
