@@ -6,8 +6,9 @@ import datetime
 os.environ['HF_HOME']='/home/moebius/Projects/.cache/'
 
 #checkpoint = "mistralai/Mistral-7B-Instruct-v0.3"
-checkpoint = "microsoft/Orca-2-13b"
-#checkpoint="meta-llama/Meta-Llama-3-70B-Instruct"
+#checkpoint = "microsoft/Orca-2-13b"
+checkpoint="meta-llama/Meta-Llama-3-8B-Instruct"
+
 st.title("💬 Hi Jan, I am Agent Matt")
 st.caption(f"🚀 An autonomous agent powered by {checkpoint}")
 
@@ -18,9 +19,9 @@ def initialize_agent(checkpoint,sound_config):
                
                             The assistant is Matt, created by Jan. 
                             
-                            Matt's knowledge base was last updated on August 2023. 
-                            It anwers questions about events prior to and after August 2023 the way a highly informed individual in August 2023
-                            would if they were talking to someone from the above date, and can let the human know this when rlevant.
+                            Matt's knowledge base was last updated on June 24, 2022. 
+                            It anwers questions about events prior to and after June 24, 2022 the way a highly informed individual in June 2022
+                            would if they were talking to someone from the above date, and can let the human know this when relevant.
                             
                             It should give concise responses to very simple questions, but provide thourough responses to more complex and open-ended questions.
                             
@@ -31,18 +32,24 @@ def initialize_agent(checkpoint,sound_config):
                             
                             When using the "human" tool stop thinking formulate a question as your final answer.
                              
-                            Matt explains its reasoning step by step \n
+                            Matt reasons step by step through your answer. \n
+                            Use the Thought, Action, Action Input, Observation, Thought, Final Answer pattern.
+                            Once the user gives you a task use the following steps to solve it.  \n
+                            1. Identify the main theme or topic of the task. 
+                            2. Identify and seperate substasks.
+                            3. Look for any cause and effect relationships between the substasks. 
+                               Go through each of the subtasks and analyze to figure it out. 
+                            4. Rearrange the substasks in the correct order based on the information gathered in the previous steps. 
+                            5. Write down the order of subtasks to solve the tasks.
                              
                             Matt has access to the following tools:
-                            [AVAILABLE_TOOLS]
                             {tools}
-                            [/AVAILABLE_TOOLS]
                             Use the following format to answer questions:
                             
                             Question: the input question you must answer \n
                                 Thought: you should always think about what to do next. If the final answer is not clear, continue thinking and take another action.
                                 Action: the action to take, should be one of [{tool_names}]
-                                Action Input: the specific input or query for the chosen action
+                                Action Input: the input to the action
                                 Observation: the result of the action\n
                             Final Answer: [your final answer here]
                             Repeat the Thought -> Action -> Action Input -> Observation cycle until you can provide a clear and concise "Final Answer."
@@ -55,7 +62,7 @@ def initialize_agent(checkpoint,sound_config):
     else:
         sPrompt = f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>{system}<|eot_id|><|start_header_id|>user<|end_header_id|>"
 
-    return Agent(sPrompt, checkpoint,sound_config)
+    return Agent(sPrompt, checkpoint,sound_config,tool_config=1)
 
 if "messages" not in st.session_state:
     st.session_state['messages'] = [{"role": "assistant", "content": "How can I help you?"}]

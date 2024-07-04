@@ -219,13 +219,13 @@ class Agent():
             fewshot_examples = json.load(file)
 
         #
-        quantization_config = BitsAndBytesConfig(load_in_8bit=True,llm_int8_threshold=50.0,llm_int8_enable_fp32_cpu_offload=True)
+        quantization_config = BitsAndBytesConfig(load_in_8bit=False,llm_int8_threshold=50.0,llm_int8_enable_fp32_cpu_offload=True)
 
         # First load the "brain" of the organization
         #https://docs.mistral.ai/api/#operation/createChatCompletion
 
         model_kwargs = {
-            "max_length": 16384,
+            "max_length": 4096,
             "device_map": "auto",
             "offload_folder": "offload",
             "max_memory": {3: "12GB", 1: "8GB", 2: "8GB", 0: "8GB", 4: "11GB"},
@@ -234,7 +234,6 @@ class Agent():
 
         }
 
-        #tokenizer = MistralTokenizer.v3()
 
         llm = HuggingFacePipeline.from_model_id(
             model_id=checkpoint,
@@ -242,16 +241,12 @@ class Agent():
             device=None,
             batch_size=64,
             pipeline_kwargs={
-                "max_new_tokens": 2048,  # changed from 2048
-                "top_p": 0.15,  # changed from 0.15
-                #"temperature":0.1,
-                #"top_k": 1,
+                "max_new_tokens": 4096,  # changed from 2048
+                "top_p": 1,  # changed from 0.15
+                "temperature":0.9,
                 "do_sample": True,  # changed from true
-                "torch_dtype": torch.float16,  # bfloat16
+                "torch_dtype": torch.float32,  # bfloat16
                 "use_fast": True,
-                #"repetition_penalty":1,
-                #"num_beams":4,
-                #"eos_token_id"
             },
             model_kwargs=model_kwargs
         )
@@ -259,10 +254,13 @@ class Agent():
         #llm = llm.to_bettertransformer()
 
         if tool_config==1:
-            #"serpapi","google-finance"
-            tools = load_tools(["human", "wikipedia","llm-math"], llm=llm)
+            print(" All tools available")
+            #human, Search, google_finance, arxiv, wikipedia, Calculator
+            tools = load_tools(["human","serpapi","google-finance", "arxiv", "wikipedia","llm-math"], llm=llm)
         elif tool_config==2:
             tools = load_tools(["wikipedia", "llm-math"], llm=llm)
+        elif tool_config==3:
+            tools = load_tools(["serpapi","wikipedia", "llm-math"], llm=llm)
         else:
             tools = load_tools(["human", "serpapi", "google-finance", "wikipedia", "llm-math"], llm=llm)
 
@@ -272,6 +270,7 @@ class Agent():
                         Begin!
                         {chat_history}
                         Question: {input}
+                        {tools}
                         {agent_scratchpad}
                        """
 
@@ -304,11 +303,15 @@ class Agent():
             ]
         )
 
+        tool_names = ", ".join([t.name for t in tools])
+
         prompt = PromptTemplate.from_template(template=template)
         prompt = prompt.partial(
             tools=render_text_description(tools),
             tool_names=", ".join([t.name for t in tools]),
         )
+
+
         #tell me a bunny joke
 
         # Fourth ensure that the agent has access to memory
@@ -332,11 +335,18 @@ class Agent():
 
     def get_agent_response(self,prompt_text):
         torch.cuda.empty_cache()
-        input_text={"input": prompt_text.strip()}
-        response = self.agent_executor.invoke(input_text)
-        #print(dict(response)['output'])
-        return dict(response)
 
+        critic="False"
+        while not "Yes" in critic:
+            input_text={"input": prompt_text.strip()}
+            response = self.agent_executor.invoke(input_text)
+
+            #. Prompt :{input_text}. Response: {response}"
+            #critic_prompt={"input":f"Is the reponse a great answer to the prompt? Answer only 'Yes' or 'No'. Response:{response}. Prompt:{input_text}"}
+            #critic = self.agent_executor.invoke(critic_prompt)
+            critic="Yes"
+
+        return dict(response)
 
     def speak(self, txt, store_local=True):
         wav_data=self.speaker.speak(txt,store_local)
