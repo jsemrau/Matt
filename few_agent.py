@@ -21,6 +21,10 @@ from langchain.agents.output_parsers import (
 
 import transformers
 
+
+from accelerate import Accelerator
+accelerator=Accelerator()
+
 #PROMPT RELATED
 from langchain import hub
 from langchain_core.prompts import PromptTemplate,FewShotChatMessagePromptTemplate,ChatPromptTemplate, MessagesPlaceholder
@@ -58,9 +62,9 @@ os.environ["ALPHAVANTAGE_API_KEY"]=os.getenv("ALPHAVANTAGE_API_KEY")
 #os.environ["PYTORCH_CUDA_ALLOC_CONF"]="expandable_segments:True,max_split_size_mb:512,garbage_collection_threshold:0.8"
 #os.environ["PYTORCH_CUDA_ALLOC_CONF"]="backend:cudaFreeAsync,expandable_segments:True"
 #os.environ["PYTORCH_CUDA_ALLOC_CONF"]="backend:cudaMallocAsync,expandable_segments:True"
-os.environ['CUDA_VISIBLE_DEVICES']='3,4,2,1,0'
+os.environ['CUDA_VISIBLE_DEVICES']='4,3,2,1,0' #
 os.environ["PYTORCH_USE_CUDA_DSA"] = "0"
-os.environ["PYTORCH_CUDA_ALLOC_CONF"]="expandable_segments:True,max_split_size_mb:32,garbage_collection_threshold:0.8"
+os.environ["PYTORCH_CUDA_ALLOC_CONF"]="expandable_segments:True"
 os.environ['HF_HOME']='/home/moebius/Projects/.cache/'
 class CustomOutputParser(AgentOutputParser):
 
@@ -223,14 +227,14 @@ class Agent():
         if sound_config=="on":
             self.speaker = SpeakAgent()
 
-        quantization_config = BitsAndBytesConfig(load_in_8bit=True,llm_int8_threshold=25.0,llm_int8_enable_fp32_cpu_offload=True)
+        quantization_config = BitsAndBytesConfig(load_in_8bit=False,llm_int8_threshold=25.0,llm_int8_enable_fp32_cpu_offload=True)
 
         model_kwargs = {
             "offload_folder": "offload",
             "max_memory": {4: "11GB",3: "12GB", 0: "8GB", 1: "8GB", 2: "8GB"},
             "quantization_config": quantization_config,
             "low_cpu_mem_usage" : "True",
-            "device_map":"auto",
+            "device_map": {"":accelerator.process_index},
            # "attn_implementation":"flash_attention_2"
         }
 
@@ -271,6 +275,8 @@ class Agent():
                             model=checkpoint,
                             max_new_tokens=256,
                             device_map="auto",
+                            batch_size=4,
+                            #{"":accelerator.process_index},
                             device=None
         )
 
@@ -283,7 +289,7 @@ class Agent():
                                     pipeline=pipe,
                                     model_kwargs=model_kwargs,
                                     pipeline_kwargs=pipeline_kwargs,
-                                    #batch_size=16,
+                                    batch_size=2,
                                   )
 
 
