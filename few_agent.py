@@ -19,6 +19,8 @@ from langchain.agents.output_parsers import (
     ReActJsonSingleInputOutputParser,ReActSingleInputOutputParser
 )
 
+import transformers
+
 #PROMPT RELATED
 from langchain import hub
 from langchain_core.prompts import PromptTemplate,FewShotChatMessagePromptTemplate,ChatPromptTemplate, MessagesPlaceholder
@@ -52,11 +54,13 @@ os.environ["SERPAPI_API_KEY"] =os.getenv("SERPAPI_API_KEY")
 os.environ["ALPHAVANTAGE_API_KEY"]=os.getenv("ALPHAVANTAGE_API_KEY")
 
 #******  Custom   *********
-
-os.environ["PYTORCH_CUDA_ALLOC_CONF"]="expandable_segments:True"
-os.environ["PYTORCH_CUDA_ALLOC_CONF"]="max_split_size_mb:32"
-os.environ['CUDA_VISIBLE_DEVICES']='4,0,1,2,3'
-os.environ["PYTORCH_USE_CUDA_DSA"] = "1"
+#,backend:cudaMallocAsync
+#os.environ["PYTORCH_CUDA_ALLOC_CONF"]="expandable_segments:True,max_split_size_mb:512,garbage_collection_threshold:0.8"
+#os.environ["PYTORCH_CUDA_ALLOC_CONF"]="backend:cudaFreeAsync,expandable_segments:True"
+#os.environ["PYTORCH_CUDA_ALLOC_CONF"]="backend:cudaMallocAsync,expandable_segments:True"
+os.environ['CUDA_VISIBLE_DEVICES']='3,4,2,1,0'
+os.environ["PYTORCH_USE_CUDA_DSA"] = "0"
+os.environ["PYTORCH_CUDA_ALLOC_CONF"]="expandable_segments:True,max_split_size_mb:32,garbage_collection_threshold:0.8"
 os.environ['HF_HOME']='/home/moebius/Projects/.cache/'
 class CustomOutputParser(AgentOutputParser):
 
@@ -143,6 +147,7 @@ class CustomOutputParser(AgentOutputParser):
         with open(file_name, 'w') as file:
             file.write(str(jsondata))
 
+        return file_name
     def remove_human_ai_messages(self,input_string):
         # Define a regular expression pattern to match the HumanMessage and AIMessage parts
         pattern = r"\[HumanMessage\(content='.*?'\), AIMessage\(content='.*?'\)\]"
@@ -178,6 +183,7 @@ class CustomOutputParser(AgentOutputParser):
                 final_answer_part = llm_output.strip()
 
             clean_string=self.remove_human_ai_messages(final_answer_part)
+            #return {"response": clean_string, "thoughts":fName}
             return clean_string
 
             # Find the index of the first newline in this part
@@ -206,6 +212,9 @@ class Agent():
     def __init__(self, system_prefix, checkpoint, agent_type= "default", tool_config="1",sound_config="off") -> None:
 
         print("******************  Initializing Matt...  ************************")
+        with torch.no_grad():
+            torch.cuda.empty_cache()
+
         self.checkpoint=checkpoint
 
         torch.backends.cuda.matmul.allow_tf32 = True
@@ -214,44 +223,71 @@ class Agent():
         if sound_config=="on":
             self.speaker = SpeakAgent()
 
-        filename = "./data/few_shot_mistral_mentor.json"
-        with open(filename, 'r') as file:
-            fewshot_examples = json.load(file)
-
-        #
-        quantization_config = BitsAndBytesConfig(load_in_8bit=False,llm_int8_threshold=50.0,llm_int8_enable_fp32_cpu_offload=True)
-
-        # First load the "brain" of the organization
-        #https://docs.mistral.ai/api/#operation/createChatCompletion
+        quantization_config = BitsAndBytesConfig(load_in_8bit=True,llm_int8_threshold=25.0,llm_int8_enable_fp32_cpu_offload=True)
 
         model_kwargs = {
-            "max_length": 4096,
-            "device_map": "auto",
             "offload_folder": "offload",
-            "max_memory": {3: "12GB", 1: "8GB", 2: "8GB", 0: "8GB", 4: "11GB"},
+            "max_memory": {4: "11GB",3: "12GB", 0: "8GB", 1: "8GB", 2: "8GB"},
             "quantization_config": quantization_config,
-            #"attn_implementation":"flash_attention_2",
-
+            "low_cpu_mem_usage" : "True",
+            "device_map":"auto",
+           # "attn_implementation":"flash_attention_2"
         }
 
+        #device_map="auto",
 
+        """
         llm = HuggingFacePipeline.from_model_id(
             model_id=checkpoint,
             task="text-generation",
-            device=None,
-            batch_size=64,
+            device_map="auto",
+            batch_size=2,
             pipeline_kwargs={
-                "max_new_tokens": 4096,  # changed from 2048
                 "top_p": 1,  # changed from 0.15
-                "temperature":0.9,
+                "temperature":0.7,
                 "do_sample": True,  # changed from true
-                "torch_dtype": torch.float32,  # bfloat16
+                "torch_dtype": torch.float16,  # bfloat16
                 "use_fast": True,
+                #"max_length": 64,
+                "max_new_tokens": 800,
+                "repetition_penalty" : 1.1  # without this output begins repeating
             },
             model_kwargs=model_kwargs
         )
 
-        #llm = llm.to_bettertransformer()
+        """
+
+        pipeline_kwargs = {
+            "top_p": 1,  # changed from 0.15
+            "temperature": 0.7,
+            "do_sample": True,  # changed from true
+            "torch_dtype": torch.float16,  # bfloat16
+            "use_fast": True,
+            "repetition_penalty": 1.1  # without this output begins repeating
+        }
+
+        pipe = transformers.pipeline(
+                            "text-generation",
+                            model=checkpoint,
+                            max_new_tokens=256,
+                            device_map="auto",
+                            device=None
+        )
+
+        try:
+            pipe.tokenizer.pad_token_id = pipe.model.config.eos_token_id[0]
+        except:
+            pipe.tokenizer.pad_token_id = pipe.model.config.eos_token_id
+
+        llm = HuggingFacePipeline(
+                                    pipeline=pipe,
+                                    model_kwargs=model_kwargs,
+                                    pipeline_kwargs=pipeline_kwargs,
+                                    #batch_size=16,
+                                  )
+
+
+        filename = "./data/few_shot_mistral_mentor.json"
 
         if tool_config==1:
             print(" All tools available")
@@ -261,10 +297,15 @@ class Agent():
             tools_array =["wikipedia", "llm-math"]
         elif tool_config==3:
             tools_array=["serpapi","wikipedia", "llm-math"]
+            filename = "./data/few_shot_search.json"
         else:
             tools_array=["human", "serpapi", "google-finance", "wikipedia", "llm-math"]
 
         tools = load_tools(tools_array, llm=llm)
+
+        #load few shot
+        with open(filename, 'r') as file:
+            fewshot_examples = json.load(file)
 
         date_suffix = f" Today's date is { datetime.now().strftime('%A')},{ datetime.now() }."
         # Third define the way the agent should act
@@ -286,8 +327,7 @@ class Agent():
         few_shot_prompt = FewShotChatMessagePromptTemplate(
             examples=fewshot_examples,
             example_prompt=example_prompt,
-            input_variables=["input",
-                             "agent_scratchpad"],
+            input_variables=["input", "agent_scratchpad"],
         )
 
         format_instructions = f"{react_prompt.FORMAT_INSTRUCTIONS}\n " \
@@ -332,11 +372,13 @@ class Agent():
 
         #"agent_scratchpad": lambda x: format_log_to_str(x["intermediate_steps"]),
         # Seventh define the executor with the agent, its tools, memory and an execution stop.
-        self.agent_executor = AgentExecutor(agent=agent, tools=tools,memory=memory,handle_parsing_errors=True,verbose=False,max_iterations=5)
+        self.agent_executor = AgentExecutor(agent=agent, tools=tools,memory=memory,handle_parsing_errors=True,verbose=True,max_iterations=5)
         #handle_parsing_errors=False,
 
     def get_agent_response(self,prompt_text):
         torch.cuda.empty_cache()
+        import gc
+        gc.collect()
 
         critic="False"
         while not "Yes" in critic:
@@ -348,8 +390,15 @@ class Agent():
             #critic = self.agent_executor.invoke(critic_prompt)
             critic="Yes"
 
+        #print(f"**** {dict(response)} ****")
+        #return dict(response['response']),response['thoughts']
         return dict(response)
 
     def speak(self, txt, store_local=True):
         wav_data=self.speaker.speak(txt,store_local)
         return wav_data
+
+
+    def format_instruction(self, checkpoint, prompt):
+
+        return prompt
