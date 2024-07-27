@@ -67,7 +67,7 @@ def initialize_agent(checkpoint,sound_config):
     else:
         sPrompt=system
 
-    return Agent(sPrompt, checkpoint,sound_config,tool_config=3)
+    return Agent(sPrompt, checkpoint,sound_config,tool_config=1,init_type="1")
 
 if "messages" not in st.session_state:
     st.session_state['messages'] = [{"role": "assistant", "content": "How can I help you?"}]

@@ -1,22 +1,26 @@
 [
   {
     "input": "What is the capital of France?",
-    "output": "Question: What is the capital of France?\nThought: I need to find the capital city of France.\nAction: search[Capital France]  \nAction Input: capital of France\nObservation: The capital of France is Paris.\nFinal Answer: The capital of France is Paris."
+    "output": "Question: What is the capital of France?\nThought: I need to find the capital city of France.\nAction: Search[capital of France]  \nAction Input: capital of France\nObservation: The capital of France is Paris.\nFinal Answer: The capital of France is Paris.\n"
+  },
+  {
+    "input": "What are interesting news for today?",
+    "output": "Question: What are interesting news for today?\nThought: I need to find out what day is today and then search the Internet.\nAction: Search[News of today]  \nAction Input: News of today\nObservation: I received a list of news from .\nFinal Answer: [item 1, item 2, item 3,...,item n].\n"
   },
   {
     "input": "Who discovered penicillin?",
-    "output": "Question: Who discovered penicillin?\nThought: I need to find out who discovered penicillin.\nAction: wikipedia[penicillin]\nAction Input: discovery of penicillin\nObservation: Penicillin was discovered by Alexander Fleming in 1928.\nFinal Answer: Penicillin was discovered by Alexander Fleming in 1928."
+    "output": "Question: Who discovered penicillin?\nThought: I need to find out who discovered penicillin.\nAction: wikipedia[discovery of penicillin]\nAction Input: discovery of penicillin\nObservation: Penicillin was discovered by Alexander Fleming in 1928.\nFinal Answer: Penicillin was discovered by Alexander Fleming in 1928.\n"
   },
   {
     "input": "What is 25 multiplied by 16?",
-    "output": "Question: What is 25 multiplied by 16?\nThought: I need to calculate the product of 25 and 16.\nAction: Calculator[25*16]\nAction Input: 25 * 16\nObservation: The result of 25 multiplied by 16 is 400.\nFinal Answer: The result of 25 multiplied by 16 is 400."
+    "output": "Question: What is 25 multiplied by 16?\nThought: I need to calculate the product of 25 and 16.\nAction: Calculator[25 * 16]\nAction Input: 25 * 16\nObservation: The result of 25 multiplied by 16 is 400.\nFinal Answer: The result of 25 multiplied by 16 is 400.\n"
   },
   {
     "input": "Tell me about the life cycle of a butterfly.",
-    "output": "Question: Tell me about the life cycle of a butterfly.\nThought: I need to find detailed information about the life cycle of a butterfly.\nAction: wikipedia[Butterfly Lifecycle]\nAction Input: life cycle of a butterfly\nObservation: A butterfly's life cycle consists of four stages: egg, larva (caterpillar), pupa (chrysalis), and adult (butterfly).\nFinal Answer: A butterfly's life cycle consists of four stages: egg, larva (caterpillar), pupa (chrysalis), and adult (butterfly)."
+    "output": "Question: Tell me about the life cycle of a butterfly.\nThought: I need to find detailed information about the life cycle of a butterfly.\nAction: wikipedia[life cycle of a butterfly]\nAction Input: life cycle of a butterfly\nObservation: A butterfly's life cycle consists of four stages: egg, larva (caterpillar), pupa (chrysalis), and adult (butterfly).\nFinal Answer: A butterfly's life cycle consists of four stages: egg, larva (caterpillar), pupa (chrysalis), and adult (butterfly).\n"
   },
   {
     "input": "What are some healthy lunch ideas for someone on a low-carb diet?",
-    "output": "Question: What are some healthy lunch ideas for someone on a low-carb diet?\nThought: I should provide a list of healthy low-carb lunch options.\nAction: human[I should ask the user for dietary restrictions]\nAction Input: Dietary restrictions?\nObservation: I should ask the user for dietary restrictions.\nFinal Answer: Do you have any dietary restrictions?"
+    "output": "Question: What are some healthy lunch ideas for someone on a low-carb diet?\nThought: I should provide a list of healthy low-carb lunch options.\nAction: human[Dietary restrictions?]\nAction Input: Dietary restrictions?\nObservation: I should ask the user for dietary restrictions.\nFinal Answer: Do you have any dietary restrictions?\n"
   }
 ]

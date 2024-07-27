@@ -20,7 +20,7 @@ from langchain.agents.output_parsers import (
 )
 
 import transformers
-
+from torch.nn.parallel import DataParallel
 
 from accelerate import Accelerator
 accelerator=Accelerator()
@@ -59,12 +59,12 @@ os.environ["ALPHAVANTAGE_API_KEY"]=os.getenv("ALPHAVANTAGE_API_KEY")
 
 #******  Custom   *********
 #,backend:cudaMallocAsync
-#os.environ["PYTORCH_CUDA_ALLOC_CONF"]="expandable_segments:True,max_split_size_mb:512,garbage_collection_threshold:0.8"
+#os.environ["PYTORCH_CUDA_ALLOC_CONF"]="expandable_segments:True,garbage_collection_threshold:0.8"
 #os.environ["PYTORCH_CUDA_ALLOC_CONF"]="backend:cudaFreeAsync,expandable_segments:True"
 #os.environ["PYTORCH_CUDA_ALLOC_CONF"]="backend:cudaMallocAsync,expandable_segments:True"
-os.environ['CUDA_VISIBLE_DEVICES']='4,3,2,1,0' #
+#os.environ['CUDA_VISIBLE_DEVICES']='4,3,2,1' #4,3,2,1,0
 os.environ["PYTORCH_USE_CUDA_DSA"] = "0"
-os.environ["PYTORCH_CUDA_ALLOC_CONF"]="expandable_segments:True"
+os.environ["PYTORCH_CUDA_ALLOC_CONF"]="max_split_size_mb:256"
 os.environ['HF_HOME']='/home/moebius/Projects/.cache/'
 class CustomOutputParser(AgentOutputParser):
 
@@ -213,7 +213,7 @@ class CustomOutputParser(AgentOutputParser):
 
 class Agent():
 
-    def __init__(self, system_prefix, checkpoint, agent_type= "default", tool_config="1",sound_config="off") -> None:
+    def __init__(self, system_prefix, checkpoint, agent_type= "default", tool_config="1",sound_config="off",init_type="1") -> None:
 
         print("******************  Initializing Matt...  ************************")
         with torch.no_grad():
@@ -227,70 +227,72 @@ class Agent():
         if sound_config=="on":
             self.speaker = SpeakAgent()
 
-        quantization_config = BitsAndBytesConfig(load_in_8bit=False,llm_int8_threshold=25.0,llm_int8_enable_fp32_cpu_offload=True)
+        quantization_config = BitsAndBytesConfig(load_in_8bit=False,llm_int8_threshold=50.0,llm_int8_enable_fp32_cpu_offload=True)
 
         model_kwargs = {
             "offload_folder": "offload",
-            "max_memory": {4: "11GB",3: "12GB", 0: "8GB", 1: "8GB", 2: "8GB"},
             "quantization_config": quantization_config,
             "low_cpu_mem_usage" : "True",
-            "device_map": {"":accelerator.process_index},
-           # "attn_implementation":"flash_attention_2"
+            "device_map": "auto"
+            #{"":accelerator.process_index},
+            #"attn_implementation":"flash_attention_2"
         }
 
         #device_map="auto",
+        if init_type=="1":
 
-        """
-        llm = HuggingFacePipeline.from_model_id(
-            model_id=checkpoint,
-            task="text-generation",
-            device_map="auto",
-            batch_size=2,
-            pipeline_kwargs={
+            llm = HuggingFacePipeline.from_model_id(
+                model_id=checkpoint,
+                task="text-generation",
+                device=None,
+                #device_map="auto",
+                batch_size=2,
+                pipeline_kwargs={
+                    "top_p": 0.15,  # changed from 0.15
+                    "temperature":0.3,
+                    "do_sample": True,  # changed from true
+                    "torch_dtype": torch.float16,  # bfloat16
+                    "use_fast": True,
+                    #"max_length": 64,
+                    "max_new_tokens": 800,
+                    "repetition_penalty" : 1.1  # without this output begins repeating
+                },
+                model_kwargs=model_kwargs
+            )
+
+
+        else:
+
+            pipeline_kwargs = {
                 "top_p": 1,  # changed from 0.15
-                "temperature":0.7,
+                "temperature": 0.7,
                 "do_sample": True,  # changed from true
                 "torch_dtype": torch.float16,  # bfloat16
                 "use_fast": True,
-                #"max_length": 64,
-                "max_new_tokens": 800,
-                "repetition_penalty" : 1.1  # without this output begins repeating
-            },
-            model_kwargs=model_kwargs
-        )
+                "repetition_penalty": 1.1  # without this output begins repeating
+            }
 
-        """
+            pipe = transformers.pipeline(
+                                "text-generation",
+                                model=checkpoint,
+                                max_new_tokens=256,
+                                device_map="auto",
+                                batch_size=1,
+                                #{"":accelerator.process_index},
+                                device=None
+            )
 
-        pipeline_kwargs = {
-            "top_p": 1,  # changed from 0.15
-            "temperature": 0.7,
-            "do_sample": True,  # changed from true
-            "torch_dtype": torch.float16,  # bfloat16
-            "use_fast": True,
-            "repetition_penalty": 1.1  # without this output begins repeating
-        }
+            try:
+                pipe.tokenizer.pad_token_id = pipe.model.config.eos_token_id[0]
+            except:
+                pipe.tokenizer.pad_token_id = pipe.model.config.eos_token_id
 
-        pipe = transformers.pipeline(
-                            "text-generation",
-                            model=checkpoint,
-                            max_new_tokens=256,
-                            device_map="auto",
-                            batch_size=4,
-                            #{"":accelerator.process_index},
-                            device=None
-        )
-
-        try:
-            pipe.tokenizer.pad_token_id = pipe.model.config.eos_token_id[0]
-        except:
-            pipe.tokenizer.pad_token_id = pipe.model.config.eos_token_id
-
-        llm = HuggingFacePipeline(
-                                    pipeline=pipe,
-                                    model_kwargs=model_kwargs,
-                                    pipeline_kwargs=pipeline_kwargs,
-                                    batch_size=2,
-                                  )
+            llm = HuggingFacePipeline(
+                                        pipeline=pipe,
+                                        model_kwargs=model_kwargs,
+                                        pipeline_kwargs=pipeline_kwargs,
+                                        #batch_size=2,
+                                      )
 
 
         filename = "./data/few_shot_mistral_mentor.json"
@@ -382,9 +384,9 @@ class Agent():
         #handle_parsing_errors=False,
 
     def get_agent_response(self,prompt_text):
-        torch.cuda.empty_cache()
-        import gc
-        gc.collect()
+        #torch.cuda.empty_cache()
+        #import gc
+        #gc.collect()
 
         critic="False"
         while not "Yes" in critic:
