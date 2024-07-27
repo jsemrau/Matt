@@ -249,11 +249,10 @@ class Agent():
                 batch_size=2,
                 pipeline_kwargs={
                     "top_p": 0.15,  # changed from 0.15
-                    "temperature":0.3,
+                    "temperature":0.01,
                     "do_sample": True,  # changed from true
                     "torch_dtype": torch.float16,  # bfloat16
                     "use_fast": True,
-                    #"max_length": 64,
                     "max_new_tokens": 800,
                     "repetition_penalty" : 1.1  # without this output begins repeating
                 },

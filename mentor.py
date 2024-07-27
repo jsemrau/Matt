@@ -84,15 +84,7 @@ if prompt := st.chat_input():
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
-
-    if 'mistral' in checkpoint:
-        fInput=f" [INST]<<SYS>>{prompt}<</SYS>>[/INST]"
-    elif 'llama' in checkpoint or 'Orca' in checkpoint:
-        fInput = f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>{prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"
-    else:
-        fInput=prompt
-
-    result = st.session_state["agent"].get_agent_response(fInput)
+    result = st.session_state["agent"].get_agent_response(prompt)
     msg = result['output']
 
     if sound_config == "on":
