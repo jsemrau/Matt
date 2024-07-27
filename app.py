@@ -5,7 +5,7 @@ import datetime
 
 os.environ['HF_HOME']='/home/moebius/Projects/.cache/'
 
-checkpoint = "mistralai/Mistral-7B-Instruct-v0.3"
+checkpoint="mistralai/Mistral-Nemo-Instruct-2407"
 
 st.title("💬 Hi Jan, I am Agent Matt")
 st.caption(f"🚀 An autonomous agent powered by {checkpoint}")
@@ -59,7 +59,7 @@ def initialize_agent(checkpoint,sound_config):
                         [/INST]
              '''
 
-    return Agent(system, checkpoint,sound_config)
+    return Agent(system, checkpoint,sound_config,tool_config=1,init_type="1")
 
 if "messages" not in st.session_state:
     st.session_state['messages'] = [{"role": "assistant", "content": "How can I help you?"}]
@@ -76,8 +76,8 @@ if prompt := st.chat_input():
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
-    fInput = f"<s>[INST]{prompt}[/INST]"
-    result = st.session_state["agent"].get_agent_response(fInput)
+    #fInput = f"<s>[INST]{prompt}[/INST]"
+    result = st.session_state["agent"].get_agent_response(prompt)
     msg = result['output']
 
     if sound_config == "on":

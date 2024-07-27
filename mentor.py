@@ -19,8 +19,7 @@ st.caption(f"🚀 An autonomous agent powered by {checkpoint}")
 sound_config="off"
 @st.cache_resource
 def initialize_agent(checkpoint,sound_config):
-    system = '''
-               
+    system = ''' 
                             The assistant is Matt, created by Jan. 
                             
                             It anwers questions about events the way a highly informed individual would if they were talking to someone from the today's date, and can let the human know this when relevant.
@@ -55,19 +54,10 @@ def initialize_agent(checkpoint,sound_config):
                                     Observation: the result of the action\n
                                 Final Answer: [your observation and conclusion]
                                 
-                            Repeat the Thought -> Action -> Action Input -> Observation cycle until you can provide a clear and concise "Final Answer."
-                    
-                       
+                            Repeat the Thought -> Action -> Action Input -> Observation cycle until you can provide a clear and concise "Final Answer."  
              '''
 
-    if 'mistral' in checkpoint:
-        sPrompt=f"[INST]<<SYS>>{system}<</SYS>>[/INST]"
-    elif 'llama' in checkpoint or 'Orca' in checkpoint:
-        sPrompt = f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>{system}<|eot_id|><|start_header_id|>user<|end_header_id|>"
-    else:
-        sPrompt=system
-
-    return Agent(sPrompt, checkpoint,sound_config,tool_config=1,init_type="1")
+    return Agent(system, checkpoint,sound_config,tool_config=1,init_type="1")
 
 if "messages" not in st.session_state:
     st.session_state['messages'] = [{"role": "assistant", "content": "How can I help you?"}]
